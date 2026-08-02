@@ -55,6 +55,10 @@ Fine-tune a diffusion model on `(input_image, instruction, output_image)` triple
 
 Keep a standard unconditional diffusion model. At each reverse step, resample — jump back to a noisier state occasionally and regenerate. Avoids boundary artifacts. Used when you don't have a trained inpainting model.
 
+```figure
+inpaint-mask-reinject
+```
+
 ## Build It
 
 `code/main.py` implements a toy 1-D inpainting scheme on 5-dimensional data. We train a DDPM on 5-D mixture data where each sample is 5 floats from one of two clusters. At inference, we "mask" 2 of the 5 dimensions, inject the noisy-forward version of the unmasked three at each step, and regenerate only the masked dimensions.
@@ -129,7 +133,7 @@ Save `outputs/skill-editing-pipeline.md`. Skill takes an original image + edit d
 |------|-----------------|-----------------------|
 | Inpainting | "Fill the hole" | Regenerate inside a mask; keep outside pixels. |
 | Outpainting | "Extend the canvas" | Regenerate outside the canvas; keep inside. |
-| 9-channel U-Net | "Proper inpainting model" | U-Net with `noisy | encoded-source | mask` as input. |
+| 9-channel U-Net | "Proper inpainting model" | U-Net with `noisy \| encoded-source \| mask` as input. |
 | SDEdit | "Img2img with noise level" | Noise to time `t`, denoise with new prompt. |
 | InstructPix2Pix | "Text-only edits" | Fine-tuned diffusion on (image, instruction, output) triples. |
 | RePaint | "No retraining" | Re-noise periodically during reverse to reduce seams. |

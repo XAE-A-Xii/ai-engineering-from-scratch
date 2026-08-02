@@ -53,6 +53,10 @@ with `λ ∈ [0, 1]`. `λ = 0` is TD (low variance, high bias). `λ = 1` is MC (
 
 Three terms: policy-gradient loss, value regression, entropy bonus. `c_v ~ 0.5`, `c_e ~ 0.01` are canonical starting points.
 
+```figure
+actor-critic
+```
+
 ## Build It
 
 ### Step 1: a critic
@@ -174,7 +178,7 @@ Refuse single-worker A2C on environments with horizon > 1000 (too on-policy, too
 
 | Term | What people say | What it actually means |
 |------|-----------------|-----------------------|
-| Actor | "The policy net" | `π_θ(a|s)`, updated by policy gradient. |
+| Actor | "The policy net" | `π_θ(a\|s)`, updated by policy gradient. |
 | Critic | "The value net" | `V_φ(s)`, updated by MSE regression to returns / TD targets. |
 | Advantage | "How much better than average" | `A(s, a) = Q(s, a) - V(s)` or its estimators. Multiplier for `∇ log π`. |
 | TD residual | "δ" | `δ_t = r + γ V(s') - V(s)`; one-step advantage estimate. |

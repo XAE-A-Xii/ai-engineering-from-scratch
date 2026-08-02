@@ -1,6 +1,6 @@
 # Topic Modeling — LDA and BERTopic
 
-> LDA: documents are mixtures of topics, topics are distributions over words. BERTopic: documents cluster in embedding space, clusters are topics. Same goal, different primitives.
+> LDA: documents are mixtures of topics, topics are distributions over words. BERTopic: documents cluster in embedding space, clusters are topics. Same goal, different decompositions.
 
 **Type:** Learn
 **Languages:** Python
@@ -38,6 +38,10 @@ Key LDA output:
 4. For each cluster, compute class-based TF-IDF over the cluster's documents to extract top words.
 
 Output is one topic per document (plus a -1 outlier label). Optionally, a soft membership via HDBSCAN's probability vector.
+
+```figure
+topic-drift
+```
 
 ## Build It
 

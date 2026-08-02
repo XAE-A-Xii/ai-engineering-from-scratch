@@ -97,6 +97,10 @@ Cost of subscriptions: per-session state on the server (who is subscribed to wha
 
 Prompts in MCP are not system prompts. The host's system prompt (its own operating instructions) and MCP prompts (server-supplied templates invoked by user) live side by side. A well-behaved client never lets a server prompt override its own system prompt; it layers them.
 
+```figure
+t3-primitive-sort
+```
+
 ## Use It
 
 `code/main.py` extends the notes server from Lesson 07 with:
@@ -136,7 +140,7 @@ This lesson produces `outputs/skill-primitive-splitter.md`. Given a proposed MCP
 | Prompt | "Slash-command template" | Named multi-message template with argument slots |
 | Prompt arguments | "Template inputs" | Typed parameters the host collects before rendering |
 | `prompts/get` | "Render template" | Server returns the filled-in message list |
-| Content block | "Typed chunk" | `{type: text | image | resource | ui_resource}` |
+| Content block | "Typed chunk" | `{type: text \| image \| resource \| ui_resource}` |
 | Slash-command UX | "User shortcut" | Host surfaces prompts as commands starting with `/` |
 
 ## Further Reading

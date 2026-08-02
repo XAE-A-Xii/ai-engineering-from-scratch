@@ -70,6 +70,10 @@ Canonical workflow in 2026:
 
 Community results: fine-tuning Medium on 20 hours of medical dictation drops WER from 12% to 4.5% on medical vocabulary. Fine-tuning Turbo on 4 hours of Icelandic drops WER from 18% to 6%.
 
+```figure
+sp-asr-attention
+```
+
 ## Build It
 
 ### Step 1: run Whisper out of the box
@@ -171,7 +175,7 @@ Save as `outputs/skill-whisper-tuner.md`. Design a Whisper fine-tune or inferenc
 | Term | What people say | What it actually means |
 |------|-----------------|-----------------------|
 | 30-sec window | Whisper's limit | Hard input cap; chunk longer audio. |
-| SOT | Start-of-transcript | `<|startoftranscript|>` kicks off the decoder prompt. |
+| SOT | Start-of-transcript | `<\|startoftranscript\|>` kicks off the decoder prompt. |
 | Timestamps token | Temporal alignment | Every 0.02 s offset is a special token in the 51k vocab. |
 | Turbo | The fast variant | 4-decoder layers, 8× faster, <1% WER regression. |
 | WhisperX | The long-form wrapper | VAD + Whisper + wav2vec alignment + diarization. |
