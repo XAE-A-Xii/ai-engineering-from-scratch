@@ -87,7 +87,7 @@ Output: three verdict reports, each saved next to the script.
 
 ## Production patterns in the wild
 
-Four patterns elevate the gate from "another lint job" to "the deciding edge."
+Five patterns elevate the gate from "another lint job" to "the deciding edge."
 
 **Defense-in-depth, not single gate.** Pre-commit hook → CI status check → pre-tool authz hook → pre-merge gate. Each layer is deterministic so a failure in one layer is caught by the next. microservices.io's March 2026 playbook is explicit: the pre-commit hook is non-bypassable because, unlike a model-side skill, it does not depend on the agent following instructions. The verification gate sits at the CI / pre-merge layer.
 
@@ -140,7 +140,6 @@ The gate is the deciding edge in the workbench flow. Every other surface is upst
 - [Type-Checked Compliance: Deterministic Guardrails (arXiv 2604.01483)](https://arxiv.org/pdf/2604.01483) — Lean 4 as the upper bound of deterministic gating
 - [logi-cmd/agent-guardrails — merge gate spec](https://github.com/logi-cmd/agent-guardrails) — scope + mutation-testing gates
 - [Guardrails AI x MLflow](https://guardrailsai.com/blog/guardrails-mlflow) — deterministic validators as CI scorers
-- [Akira, Real-Time Guardrails for Agentic Systems](https://www.akira.ai/blog/real-time-guardrails-agentic-systems) — pre/post-tool gates
 - Phase 14 · 27 — prompt injection defenses (the gate's adversarial pair)
 - Phase 14 · 36 — the scope contract this gate enforces
 - Phase 14 · 37 — the feedback log this gate scores

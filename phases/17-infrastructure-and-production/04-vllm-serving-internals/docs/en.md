@@ -11,8 +11,8 @@
 
 - Explain PagedAttention as a KV cache allocator: blocks, block tables, and why fragmentation stays under 4% at production load.
 - Diagram continuous batching at the iteration level: how finished sequences leave the batch and new ones join without draining.
-- Describe chunked prefill in one sentence and name which latency metric it protects (hint: it is TTFT tail, not mean throughput).
-- Name the 2026 vLLM v0.18.0 gotcha that bites teams enabling every optimization at once.
+- Describe chunked prefill in one sentence and name which latency metric it protects (hint: it is the ITL tail of concurrent decodes, not mean throughput).
+- Check a vLLM feature combination against the compatibility matrix for your version before enabling every optimization at once.
 
 ## The Problem
 
@@ -44,7 +44,7 @@ Continuous batching operates between each decode step. Call the set of running s
 
 The batch size is never padded to a fixed number. Sequences at different positions in their output share one fused forward. In 2026 vLLM this is called the `V1 scheduler`. The key invariant: the scheduler runs once per decode iteration, not once per request.
 
-### Chunked prefill protects TTFT tail
+### Chunked prefill protects the ITL tail
 
 Prefill is compute-bound. A 32k-token prompt on Llama 3.3 70B takes ~800 ms of pure prefill on one H100. While prefill runs, decode tokens for every other sequence in the batch wait. In a serving loop, the first-token latency (TTFT) of one long prompt becomes the inter-token latency (ITL) blip for dozens of other users.
 
@@ -56,9 +56,9 @@ All three features assume each other. PagedAttention gives the scheduler a fine-
 
 You do not need to know every flag. You need to know what the scheduler optimizes: goodput under KV-block budget, subject to chunked prefill slicing.
 
-### The 2026 v0.18.0 gotcha
+### Check the compatibility matrix
 
-In vLLM v0.18.0 you cannot combine `--enable-chunked-prefill` with draft-model speculative decoding (`--speculative-model`). The documented exception is N-gram GPU speculative decoding in the V1 scheduler. Teams that flip every flag on without reading the release notes get a run-time error at startup, not a soft regression. If your speculative gain was worth enabling chunked prefill for, revisit the choice — the right answer in 2026 is often EAGLE-3 without chunked prefill, not a draft model plus chunked prefill that does not compile.
+Check every feature combination against the compatibility matrix for your exact vLLM version before enabling all of them at once, because what composes changes between releases. In v0.18.0 the feature matrix marks speculative decoding as compatible with chunked prefill and prefix caching, and the speculative-decoding page lists two known incompatibilities: pipeline parallelism through v0.15.0, and draft-model speculation through v0.10.0. For the draft method itself, the 2026 default is often EAGLE-3 (`"method": "eagle3"`), covered in Phase 17 · 05.
 
 ### Numbers you should remember
 
@@ -130,8 +130,8 @@ This lesson produces `outputs/skill-vllm-scheduler-reader.md`. Given a serving c
 | Chunked prefill | "prefill splitting" | Break long prefill into 512-token slices interleaved with decode |
 | TTFT | "first token time" | Prefill + queue + network; dominated by prefill at long prompts |
 | ITL | "inter-token latency" | Time between consecutive decode tokens; dominated by batch size |
-| Goodput | "throughput that meets SLO" | Tokens/sec where every request still hit TTFT and ITL targets |
-| V1 scheduler | "the new scheduler" | vLLM's 2026 scheduler; N-gram spec decode is the chunked-prefill-compatible path |
+| Goodput | "throughput that meets SLO" | Requests/sec that still hit TTFT and ITL targets (Phase 17 · 08 reports it as the share of requests) |
+| V1 scheduler | "the new scheduler" | vLLM's 2026 scheduler; runs continuous batching with chunked prefill |
 | `--gpu-memory-utilization` | "the memory knob" | Fraction of HBM reserved for KV blocks after weights and activations |
 
 ## Further Reading

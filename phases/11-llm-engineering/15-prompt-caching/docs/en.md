@@ -46,7 +46,7 @@ Violate the order — put the user message above the system prompt, interleave d
 
 ### The break-even calculation
 
-Anthropic's 25% write premium means a cached block has to be read at least twice to net-save money. 1 write + 1 read averages 0.675x cost per request (saves 32%); 1 write + 10 reads averages 0.205x (saves 80%). Rule of thumb: cache anything you expect to reuse at least 3 times within the TTL.
+Anthropic's 25% write premium (5-minute TTL) pays for itself on the first read, because a cache read costs 0.1x. 1 write + 1 read averages 0.675x cost per request (saves 32%); 1 write + 10 reads averages 0.205x (saves 80%). The 1-hour TTL charges 2x for the write, so that block needs two reads to come out ahead. Rule of thumb: cache anything you expect to reuse at least 3 times within the TTL; that clears break-even on either TTL.
 
 ```figure
 prompt-cache-hit
@@ -141,7 +141,7 @@ from google.genai import types
 client = genai.Client()
 
 cache = client.caches.create(
-    model="gemini-3-pro",
+    model="gemini-3.8-flash",
     config=types.CreateCachedContentConfig(
         display_name="rubric-v3",
         system_instruction=RUBRIC,
@@ -151,7 +151,7 @@ cache = client.caches.create(
 )
 
 resp = client.models.generate_content(
-    model="gemini-3-pro",
+    model="gemini-3.8-flash",
     contents=["Review this code:\n" + code],
     config=types.GenerateContentConfig(cached_content=cache.name),
 )
