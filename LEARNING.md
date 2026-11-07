@@ -79,7 +79,9 @@ and the fix is more typing, not an earlier phase.
 | Date | Lesson | Quiz | Note |
 |------|--------|------|------|
 | 2026-11-07 | 14/01 the-agent-loop | 2/2 | Typed the full loop in `scratch/agent_loop.py`; trace matches reference. Also did Exercise 3 (malformed reply becomes an error observation). Recurring slips: `print` vs `return`, unclosed brackets, `self = {}` vs `self.x = {}`, using a variable inside the `except` that failed to exist. |
+| 2026-11-07 | 14/02 rewoo-plan-and-execute | 1/2 | Built `scratch/rewoo.py` reusing own `ToolRegistry`; output matches reference. Found and fixed the `#E1`-inside-`#E10` bug (longest key first). Got stuck on data flow in `run_workers` until shown a per-step state table. Missed Plan-and-Act (not covered in depth while teaching). |
 
 ## Review queue
 
 <!-- learn adds lessons the quizzes flag -->
+- 14/02 rewoo-plan-and-execute: Plan-and-Act — long-horizon (>30 step) web/mobile tasks, planner trained on synthetic plans; when to pick it over plain ReWOO.
