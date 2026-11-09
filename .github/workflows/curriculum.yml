@@ -263,6 +263,62 @@ jobs:
         # the class of breakage where a lesson cannot import its own module.
         run: python3 scripts/run_lesson_tests.py
 
+  lesson-ports:
+    name: lesson ports compile and run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+        with:
+          persist-credentials: false
+      - name: single-file Rust lessons build without warnings and run
+        run: |
+          for file in $(git ls-files 'phases/*/code/*.rs'); do
+            [ -f "$(dirname "$file")/Cargo.toml" ] && continue
+            echo "::group::$file"
+            rustc --edition 2021 -D warnings -O -o "$RUNNER_TEMP/lesson" "$file"
+            timeout 120 "$RUNNER_TEMP/lesson" > /dev/null
+            echo "::endgroup::"
+          done
+      - uses: julia-actions/setup-julia@4c0cb0fce8556fdb04a90347310e5db8b1f98fb9  # v2
+        with:
+          version: "1"
+      - name: Julia lesson ports run
+        run: |
+          for file in $(git grep -l 'Julia port of .*Julia standard library only' -- 'phases/*/code/*.jl'); do
+            echo "::group::$file"
+            (cd "$RUNNER_TEMP" && timeout 300 julia --startup-file=no "$GITHUB_WORKSPACE/$file" > /dev/null)
+            echo "::endgroup::"
+          done
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff  # v5
+        with:
+          go-version: "1.24"
+          cache: false
+      - name: Go lesson ports format, vet and run
+        run: |
+          for file in $(git grep -l 'Go port of .*Go standard library only' -- 'phases/*/code/*.go'); do
+            echo "::group::$file"
+            test -z "$(gofmt -l "$file")"
+            go vet "$file"
+            (cd "$RUNNER_TEMP" && timeout 120 go run "$GITHUB_WORKSPACE/$file" < /dev/null > /dev/null)
+            echo "::endgroup::"
+          done
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020  # v4
+        with:
+          node-version: "22"
+      - name: TypeScript lesson ports type-check and run
+        run: |
+          npm install --prefix "$RUNNER_TEMP/ts" --no-save --no-package-lock tsx@4.19.2 typescript@5.6.3 @types/node@22.10.2
+          bin="$RUNNER_TEMP/ts/node_modules/.bin"
+          for file in $(git grep -l 'TypeScript port of .*Node standard library only' -- 'phases/*/code/*.ts'); do
+            echo "::group::$file"
+            "$bin/tsc" --strict --noEmit --target es2022 --module nodenext --moduleResolution nodenext --types node --typeRoots "$RUNNER_TEMP/ts/node_modules/@types" "$file"
+            case "$file" in
+              */code/lab.ts|*/code/experiments/*.ts) ;;
+              *) timeout 120 "$bin/tsx" "$file" > /dev/null ;;
+            esac
+            echo "::endgroup::"
+          done
+
   readme-counts-sync:
     name: README counts auto-fix (main only)
     runs-on: ubuntu-latest
